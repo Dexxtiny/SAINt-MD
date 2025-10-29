@@ -1,0 +1,35 @@
+{
+    "name": "savy-dni-bot",
+    "version": "1.5.4",
+    "description": "WhatsApp Bot for Savy DNI with crypto, betting, and other features",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node index.js",
+        "pair": "node index.js --pair",
+        "dev": "DEBUG=true node index.js",
+        "dev-pair": "DEBUG=true node index.js --pair",
+        "help": "node index.js --help",
+        "version": "node index.js --version"
+    },
+    "keywords": [
+        "whatsapp",
+        "bot",
+        "savy",
+        "dni",
+        "crypto",
+        "betting",
+        "whatsapp-bot"
+    ],
+    "author": "DNI Inc",
+    "license": "MIT",
+    "dependencies": {
+        "@whiskeysockets/baileys": "^6.4.0",
+        "awesome-phonenumber": "^4.0.0",
+        "axios": "^1.5.0",
+        "dotenv": "^16.3.1",
+        "firebase-admin": "^13.5.0",
+        "pino": "^8.15.0",
+        "semver": "^7.5.0"
+    }
+}
