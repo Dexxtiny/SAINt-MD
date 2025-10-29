@@ -1,5 +1,4 @@
-[file name]: captcha.js
-[file content begin]
+
 import fs from 'fs';
 
 const CAPTCHA_FILE = './captcha_settings.json';
@@ -194,4 +193,3 @@ async function isUserAdmin(client, groupJid, userJid) {
 }
 
 export { loadCaptchaSettings, PENDING_USERS };
-[file content end]
