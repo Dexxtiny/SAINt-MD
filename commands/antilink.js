@@ -1,5 +1,4 @@
-[file name]: antilink.js
-[file content begin]
+
 import fs from 'fs';
 import path from 'path';
 import logger from "../utils/logger.js";
@@ -138,4 +137,3 @@ async function isUserAdmin(client, groupJid, userJid) {
 
 // Export functions for use in message handler
 export { loadSettings, saveSettings };
-[file content end]
