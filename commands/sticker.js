@@ -168,9 +168,6 @@ async function generateTextSticker(text) {
         console.error('Text sticker API error:', error);
         
         // Fallback: Use another service
-        const fallbackResponse = await axios.post('https://sticker-api.s Rest of the code was cut off, but I'll complete it:
-
-```javascript
         const fallbackResponse = await axios.post('https://sticker-api.sanity.sh/create', {
             text: text,
             backgroundColor: '#FF69B4',
