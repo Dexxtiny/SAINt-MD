@@ -1,5 +1,4 @@
-[file name]: song.js
-[file content begin]
+
 import axios from "axios";
 import fs from "fs";
 import { promisify } from "util";
@@ -144,4 +143,3 @@ async function downloadSongAlternative(query) {
         return null;
     }
 }
-[file content end]
