@@ -1,4 +1,4 @@
-import settings from "../../config/settings.js";
+//import settings from "../../config/settings.js";
 import logger from "../../utils/logger.js";
 
 class MessageHandler {
