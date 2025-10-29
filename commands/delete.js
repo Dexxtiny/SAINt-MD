@@ -1,5 +1,4 @@
-[file name]: delete.js
-[file content begin]
+
 export default {
     name: "delete",
     description: "Delete bot messages or quoted messages",
@@ -111,4 +110,3 @@ async function isMessageFromBot(client, quotedContext) {
         return false;
     }
 }
-[file content end]
