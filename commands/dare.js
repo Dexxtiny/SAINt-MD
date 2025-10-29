@@ -1,5 +1,4 @@
-[file name]: dare.js
-[file content begin]
+
 import axios from "axios";
 
 export default {
@@ -78,4 +77,3 @@ function getDareArt() {
     ];
     return arts[Math.floor(Math.random() * arts.length)];
 }
-[file content end]
