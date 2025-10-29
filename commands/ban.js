@@ -1,5 +1,4 @@
-[file name]: ban.js
-[file content begin]
+
 export default {
     name: "ban",
     description: "Remove users from the group",
@@ -142,4 +141,3 @@ async function isUserAdmin(client, groupJid, userJid) {
         return false;
     }
 }
-[file content end]
