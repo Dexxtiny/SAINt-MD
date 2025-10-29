@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+dotenv.config();
+
 import SavyDNIXBot from "./core/bot.js";
 import logger from "./utils/logger.js";
 import fs from "fs";
