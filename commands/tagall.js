@@ -1,5 +1,4 @@
-[file name]: tagall.js
-[file content begin]
+
 export default {
     name: "tagall",
     description: "Mention all group members",
@@ -162,4 +161,3 @@ async function isUserAdmin(client, groupJid, userJid) {
         return false;
     }
 }
-[file content end]
