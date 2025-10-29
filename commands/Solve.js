@@ -1,5 +1,4 @@
-[file name]: solve.js
-[file content begin]
+
 import axios from "axios";
 import logger from "../utils/logger.js";
 
@@ -221,4 +220,3 @@ function getSolverArt() {
     
     return arts[Math.floor(Math.random() * arts.length)];
 }
-[file content end]
