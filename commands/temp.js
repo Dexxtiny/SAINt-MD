@@ -9,8 +9,9 @@ export default {
     category: "utility",
     
     async execute(message, client, args) {
+        const chatId = message.key.remoteJid;
+        
         try {
-            const chatId = message.key.remoteJid;
             const userId = message.key.participant || message.key.remoteJid;
 
             if (args[0]?.toLowerCase() === 'inbox') {
@@ -41,19 +42,60 @@ async function generateTempEmail(client, chatId, userId, message) {
     try {
         await client.sendPresenceUpdate("composing", chatId);
 
-        // Generate temp email using 1secmail API
-        const response = await axios.get(
-            "https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1",
+        const apis = [
             {
-                timeout: 10000
+                name: "temp-mail.org",
+                url: "https://api.temp-mail.org/request/domains/format/json/",
+                processor: (data) => {
+                    const domains = data;
+                    if (!domains || domains.length === 0) return null;
+                    const randomString = Math.random().toString(36).substring(2, 12);
+                    return `${randomString}@${domains[0]}`;
+                }
+            },
+            {
+                name: "guerrillamail",
+                url: "https://api.guerrillamail.com/ajax.php?f=get_email_address",
+                processor: (data) => {
+                    return data.email_addr;
+                }
             }
-        );
+        ];
 
-        const email = response.data[0];
+        let email = null;
+        let usedApi = null;
         
+        for (const api of apis) {
+            try {
+                console.log(`Trying ${api.name} API...`);
+                const response = await axios.get(api.url, {
+                    timeout: 8000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                        'Accept': 'application/json, text/plain, */*'
+                    }
+                });
+                
+                email = api.processor(response.data);
+                if (email) {
+                    usedApi = api.name;
+                    console.log(`✅ Success with ${api.name}: ${email}`);
+                    break;
+                }
+            } catch (error) {
+                console.log(`❌ ${api.name} API failed:`, error.message);
+                continue;
+            }
+        }
+
+        if (!email) {
+            throw new Error('All temp email APIs failed');
+        }
+
         // Store email with user info
         tempEmails.set(userId, {
             email: email,
+            api: usedApi,
             createdAt: Date.now(),
             messages: [],
             lastChecked: Date.now()
@@ -88,7 +130,9 @@ async function generateTempEmail(client, chatId, userId, message) {
 
     } catch (error) {
         console.error('Email generation error:', error);
-        throw error;
+        await client.sendMessage(chatId, {
+            text: "❌ All temporary email services are currently unavailable. Please try again in a few minutes."
+        }, { quoted: message });
     }
 }
 
@@ -105,16 +149,42 @@ async function checkInbox(client, chatId, userId, message) {
 
         await client.sendPresenceUpdate("composing", chatId);
 
-        // Check for new emails
-        const [username, domain] = userEmail.email.split('@');
-        const response = await axios.get(
-            `https://www.1secmail.com/api/v1/?action=getMessages&login=${username}&domain=${domain}`,
-            {
-                timeout: 15000
-            }
-        );
+        let emails = [];
+        
+        // Use different inbox checking based on which API was used
+        if (userEmail.api === "guerrillamail") {
+            // Guerrillamail inbox check
+            const [username, domain] = userEmail.email.split('@');
+            const sid = `${username}@${domain}`;
+            
+            const response = await axios.get(
+                `https://api.guerrillamail.com/ajax.php?f=get_email_list&offset=0&sid=${sid}`,
+                {
+                    timeout: 15000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                }
+            );
 
-        const emails = response.data;
+            emails = response.data.list || [];
+            
+        } else {
+            // temp-mail.org inbox check (generic approach)
+            const [username, domain] = userEmail.email.split('@');
+            const response = await axios.get(
+                `https://api.temp-mail.org/request/mail/id/${username}/format/json/`,
+                {
+                    timeout: 15000,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                }
+            );
+
+            emails = response.data || [];
+        }
+
         userEmail.lastChecked = Date.now();
 
         if (!emails || emails.length === 0) {
@@ -124,39 +194,30 @@ async function checkInbox(client, chatId, userId, message) {
             return;
         }
 
-        // Get full message details for each email
+        // Build inbox message
         let inboxMessage = `📬 *INBOX - ${userEmail.email}*\n\n`;
         
-        for (const email of emails.slice(0, 10)) { // Limit to 10 emails
-            const messageDetail = await axios.get(
-                `https://www.1secmail.com/api/v1/?action=readMessage&login=${username}&domain=${domain}&id=${email.id}`,
-                {
-                    timeout: 15000
-                }
-            );
-
-            const detail = messageDetail.data;
+        for (const email of emails.slice(0, 10)) {
+            inboxMessage += `📧 *From:* ${email.from || email.mail_from}\n`;
+            inboxMessage += `📝 *Subject:* ${email.subject || 'No Subject'}\n`;
+            inboxMessage += `🕒 *Date:* ${new Date(email.date || email.mail_timestamp * 1000).toLocaleString()}\n`;
             
-            inboxMessage += `📧 *From:* ${detail.from}\n`;
-            inboxMessage += `📝 *Subject:* ${detail.subject || 'No Subject'}\n`;
-            inboxMessage += `🕒 *Date:* ${new Date(detail.date).toLocaleString()}\n`;
+            // Show preview if available
+            if (email.body || email.mail_text) {
+                const preview = (email.body || email.mail_text).substring(0, 80) + '...';
+                inboxMessage += `📄 *Preview:* ${preview}\n`;
+            }
             
-            // Show preview of message body (first 100 chars)
-            const preview = detail.textBody ? 
-                detail.textBody.substring(0, 100) + (detail.textBody.length > 100 ? '...' : '') : 
-                'No text content';
-            
-            inboxMessage += `📄 *Preview:* ${preview}\n`;
             inboxMessage += `━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-            // Store message in user's email data
-            if (!userEmail.messages.find(msg => msg.id === email.id)) {
+            // Store message
+            if (!userEmail.messages.find(msg => msg.id === (email.id || email.mail_id))) {
                 userEmail.messages.push({
-                    id: email.id,
-                    from: detail.from,
-                    subject: detail.subject,
-                    date: detail.date,
-                    body: detail.textBody
+                    id: email.id || email.mail_id,
+                    from: email.from || email.mail_from,
+                    subject: email.subject,
+                    date: email.date || new Date(email.mail_timestamp * 1000).toISOString(),
+                    body: email.body || email.mail_text
                 });
             }
         }
@@ -173,7 +234,9 @@ async function checkInbox(client, chatId, userId, message) {
 
     } catch (error) {
         console.error('Inbox check error:', error);
-        throw error;
+        await client.sendMessage(chatId, {
+            text: "❌ Failed to check inbox. The email service might be temporarily unavailable."
+        }, { quoted: message });
     }
 }
 
@@ -211,6 +274,7 @@ async function listActiveEmails(client, chatId, userId, message) {
 📋 *YOUR TEMPORARY EMAIL*
 
 📮 *Address:* \`${userEmail.email}\`
+🔧 *Service:* ${userEmail.api}
 ⏰ *Created:* ${new Date(userEmail.createdAt).toLocaleString()}
 🕒 *Age:* ${emailAge}h (${hoursLeft}h remaining)
 📬 *Messages received:* ${userEmail.messages.length}
