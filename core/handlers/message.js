@@ -10,11 +10,9 @@ class MessageHandler {
 
   // Initialize message handler
   initialize() {
-    // Listen for incoming messages
     this.bot.client.ev.on("messages.upsert", ({ messages }) => {
       this.handleIncomingMessages(messages);
     });
-
     logger.info("Message handler initialized");
   }
 
@@ -24,18 +22,13 @@ class MessageHandler {
     logger.debug(`Command registered: ${name}`);
   }
 
-  // NEW: Check if user is group admin
+  // Check if user is group admin
   async isGroupAdmin(sender, jid) {
-    if (!jid.endsWith('@g.us')) {
-      return false; // Not a group
-    }
+    if (!jid.endsWith('@g.us')) return false;
 
     try {
       const groupMetadata = await this.bot.client.groupMetadata(jid);
-      const participant = groupMetadata.participants.find(
-        p => p.id === sender
-      );
-      
+      const participant = groupMetadata.participants.find(p => p.id === sender);
       return participant && (participant.admin === 'admin' || participant.admin === 'superadmin');
     } catch (error) {
       logger.error('Error checking admin status:', error);
@@ -43,7 +36,7 @@ class MessageHandler {
     }
   }
 
-  // NEW: Get sender ID handling both @c.us and @lid
+  // Get sender ID handling both @c.us and @lid
   getSenderId(message) {
     return message.key.participant || message.key.remoteJid;
   }
@@ -54,24 +47,27 @@ class MessageHandler {
       try {
         if (!message.message) continue;
 
-        // Get message details - UPDATED to use new getSenderId
         const jid = message.key.remoteJid;
-        const sender = this.getSenderId(message); // Use new method
+        const sender = this.getSenderId(message);
         const text = this.extractMessageText(message);
 
-        // Check if message is from an authorized number
-        if (!this.isAuthorized(sender, jid)) { // Added jid parameter
-          logger.debug(`Ignoring message from unauthorized sender: ${sender}`);
-          continue;
+        // Different logic for groups vs private
+        const isGroup = jid.endsWith('@g.us');
+        
+        if (isGroup) {
+          // GROUP: Check if sender is admin
+          const isAdmin = await this.isGroupAdmin(sender, jid);
+          if (!isAdmin) continue;
+        } else {
+          // PRIVATE: Use authorization
+          if (!this.isAuthorized(sender, jid)) continue;
         }
 
         // Check if message is a command
         if (this.isCommand(text)) {
-          await this.processCommand(text, jid, message, sender); // Pass sender
-        } else {
-          // Handle regular messages (optional)
-          await this.handleRegularMessage(text, jid, message);
+          await this.processCommand(text, jid, message, sender);
         }
+        
       } catch (error) {
         logger.error("Error handling message:", error);
       }
@@ -92,39 +88,19 @@ class MessageHandler {
     return "";
   }
 
-  // UPDATED: Check if sender is authorized - ADDED LID SUPPORT
-  isAuthorized(sender, jid) { // Added jid parameter
-    // Extract phone number from JID - UPDATED FOR LID FORMAT
-    let phoneNumber = sender.split("@")[0];
-    
-    // Handle group participant format: 1234567890:groupId → 1234567890
-    if (phoneNumber.includes(':')) {
-      phoneNumber = phoneNumber.split(':')[0];
-    }
-    
-    // Handle @lid format - extract numeric part only if it's not a LID
-    if (!sender.endsWith('@lid')) {
+  // Authorization only for private chats
+  isAuthorized(sender, jid) {
+    try {
+      let phoneNumber = sender.split("@")[0];
+      if (phoneNumber.includes(':')) {
+        phoneNumber = phoneNumber.split(':')[0];
+      }
       phoneNumber = phoneNumber.replace(/\D/g, "");
-    } else {
-      // For LID users, use the full LID as identifier
-      phoneNumber = sender; // Use full JID for LID users
+      return settings.authorizedNumbers.includes(phoneNumber);
+    } catch (error) {
+      logger.error('Error in authorization check:', error);
+      return false;
     }
-
-    // Check if number/LID is in authorized list
-    let isAuthorized;
-    if (sender.endsWith('@lid')) {
-      // For LID users, check if the full LID is authorized
-      isAuthorized = settings.authorizedNumbers.includes(sender);
-    } else {
-      // For regular numbers, check the extracted number
-      isAuthorized = settings.authorizedNumbers.includes(phoneNumber);
-    }
-
-    if (!isAuthorized) {
-      logger.warn(`Unauthorized access attempt from: ${phoneNumber} (original: ${sender})`);
-    }
-
-    return isAuthorized;
   }
 
   // Check if message is a command
@@ -132,16 +108,15 @@ class MessageHandler {
     return text && text.startsWith(settings.bot.prefix);
   }
 
-  // UPDATED: Process command - ADDED ADMIN CHECK
-  async processCommand(fullCommand, jid, originalMessage, sender) { // Added sender parameter
+  // Process command
+  async processCommand(fullCommand, jid, originalMessage, sender) {
     try {
-      // Parse command
       const [command, ...args] = fullCommand
         .slice(settings.bot.prefix.length)
         .split(" ");
       const commandName = command.toLowerCase();
 
-      logger.info(`Processing command: ${commandName} from ${jid}`);
+      logger.info(`Processing command: ${commandName} from ${sender} in ${jid}`);
 
       // Add to command history
       this.addToHistory({
@@ -156,50 +131,31 @@ class MessageHandler {
         await this.sendMessage(
           jid,
           {
-            text: `❌ Unknown command: ${commandName}\n\nUse !help to see available commands.`,
+            text: `❌ Unknown command: ${commandName}\n\nUse ${settings.bot.prefix}help to see available commands.`,
           },
           originalMessage
         );
         return;
       }
 
-      // NEW: Check if command requires admin and user is not admin
       const commandHandler = this.commands.get(commandName);
+
+      // Check command restrictions
       if (commandHandler.groupAdminOnly && jid.endsWith('@g.us')) {
         const isAdmin = await this.isGroupAdmin(sender, jid);
         if (!isAdmin) {
-          await this.sendMessage(
-            jid,
-            {
-              text: `❌ This command can only be used by group admins.`,
-            },
-            originalMessage
-          );
+          await this.sendMessage(jid, { text: `❌ This command can only be used by group admins.` }, originalMessage);
           return;
         }
       }
 
-      // Check if command is group-only and message is from private chat
       if (commandHandler.groupOnly && !jid.includes('@g.us')) {
-        await this.sendMessage(
-          jid,
-          {
-            text: `❌ This command can only be used in groups.`,
-          },
-          originalMessage
-        );
+        await this.sendMessage(jid, { text: `❌ This command can only be used in groups.` }, originalMessage);
         return;
       }
 
-      // Check if command is private-only and message is from group
       if (commandHandler.privateOnly && jid.includes('@g.us')) {
-        await this.sendMessage(
-          jid,
-          {
-            text: `❌ This command can only be used in private chats.`,
-          },
-          originalMessage
-        );
+        await this.sendMessage(jid, { text: `❌ This command can only be used in private chats.` }, originalMessage);
         return;
       }
 
@@ -207,31 +163,10 @@ class MessageHandler {
       await commandHandler.execute(originalMessage, this.bot.client, args);
     } catch (error) {
       logger.error(`Error processing command: ${fullCommand}`, error);
+      await this.sendMessage(jid, { text: "❌ An error occurred while processing your command." }, originalMessage);
+    }
+  }
 
-      await this.sendMessage(
-        jid,
-        {
-          text: "❌ An error occurred while processing your command. Please try again later.",
-        },
-        originalMessage
-      );
-    }
-  }
-/*
-  // Handle regular messages (optional)
-  async handleRegularMessage(text, jid, originalMessage) {
-    // Auto-reply for greetings
-    if (text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi')) {
-      await this.sendMessage(
-        jid,
-        {
-          text: `👋 Hello! I'm Savy DNI X bot. Use ${settings.bot.prefix}help to see what I can do!`
-        },
-        originalMessage
-      );
-    }
-  }
-*/
   // Send message helper
   async sendMessage(jid, content, quotedMessage = null) {
     try {
@@ -246,7 +181,6 @@ class MessageHandler {
   // Add command to history
   addToHistory(entry) {
     this.commandHistory.unshift(entry);
-    // Keep only the most recent commands
     if (this.commandHistory.length > settings.bot.maxCommandHistory) {
       this.commandHistory.pop();
     }
