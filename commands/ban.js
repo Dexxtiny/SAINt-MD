@@ -20,26 +20,13 @@ export default {
                 return;
             }
 
-            // Check if bot is admin
-            const botIsAdmin = await isUserAdmin(client, chat, client.user.id);
-            if (!botIsAdmin) {
-                await client.sendMessage(
-                    chat,
-                    { 
-                        text: "❌ I need to be an admin to remove users!",
-                    },
-                    { quoted: message }
-                );
-                return;
-            }
-
             const targetUser = message.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0] || args[0];
 
             if (!targetUser || !targetUser.includes('@')) {
                 await client.sendMessage(
                     chat,
                     { 
-                        text: "❌ Please mention a user to remove!\n\nExample: ban @user",
+                        text: "❌ Please mention a user to remove!\n\nExample: !ban @user",
                     },
                     { quoted: message }
                 );
@@ -47,7 +34,8 @@ export default {
             }
 
             // Check if trying to remove yourself
-            if (targetUser === (message.key.participant || message.key.remoteJid)) {
+            const sender = message.key.participant || message.key.remoteJid;
+            if (targetUser === sender) {
                 await client.sendMessage(
                     chat,
                     { 
@@ -70,9 +58,12 @@ export default {
                 return;
             }
 
+            // Get group metadata once
+            const groupMetadata = await client.groupMetadata(chat);
+            const targetParticipant = groupMetadata.participants.find(p => p.id === targetUser);
+            
             // Check if target is admin
-            const targetIsAdmin = await isUserAdmin(client, chat, targetUser);
-            if (targetIsAdmin) {
+            if (targetParticipant && (targetParticipant.admin === 'admin' || targetParticipant.admin === 'superadmin')) {
                 await client.sendMessage(
                     chat,
                     { 
@@ -108,23 +99,10 @@ export default {
             await client.sendMessage(
                 message.key.remoteJid,
                 { 
-                    text: "❌ Error removing user. Make sure I'm admin and the user exists in the group.",
+                    text: "❌ Error removing user. Make sure the user exists in the group.",
                 },
                 { quoted: message }
             );
         }
     },
 };
-
-// Helper function to check if user is admin
-async function isUserAdmin(client, groupJid, userJid) {
-    try {
-        const groupMetadata = await client.groupMetadata(groupJid);
-        const participants = groupMetadata.participants;
-        const user = participants.find(p => p.id === userJid);
-        return user && (user.admin === 'admin' || user.admin === 'superadmin');
-    } catch (error) {
-        console.error('Error checking admin status:', error);
-        return false;
-    }
-}
