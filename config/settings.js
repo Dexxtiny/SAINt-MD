@@ -38,17 +38,17 @@ const settings = {
 
 // Console logs for debugging
 console.log('🤖 BOT CONFIGURATION LOADED:');
-console.log(`📱 Authorized Number(s): ${config.authorizedNumbers.join(', ')}`);
-console.log(`🔧 Bot Prefix: ${config.bot.prefix}`);
-console.log(`👑 Admin Prefix: ${config.bot.adminPrefix}`);
-console.log(`📊 Max Command History: ${config.bot.maxCommandHistory}`);
+console.log(`📱 Authorized Number(s): ${settings.authorizedNumbers.join(', ')}`);
+console.log(`🔧 Bot Prefix: ${settings.bot.prefix}`);
+console.log(`👑 Admin Prefix: ${settings.bot.adminPrefix}`);
+console.log(`📊 Max Command History: ${settings.bot.maxCommandHistory}`);
 console.log('✅ Features Enabled:');
-Object.entries(config.features).forEach(([feature, enabled]) => {
+Object.entries(settings.features).forEach(([feature, enabled]) => {
     console.log(`   ${enabled ? '🟢' : '🔴'} ${feature}: ${enabled}`);
 });
 console.log('🌐 API Endpoints Configured:');
-console.log(`   📈 CoinGecko: ${config.api.coingecko.baseURL}`);
-console.log(`   ⚽ LiveScore: ${config.api.livescore.baseURL}`);
+console.log(`   📈 CoinGecko: ${settings.api.coingecko.baseURL}`);
+console.log(`   ⚽ LiveScore: ${settings.api.livescore.baseURL}`);
 console.log('═════════════════════════════════════════════════');
 
 export default settings;
