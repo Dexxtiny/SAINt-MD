@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const config = {
+const settings = {
     authorizedNumbers: process.env.AUTHORIZED_NUMBER 
         ? process.env.AUTHORIZED_NUMBER.split(',').map(a => a.trim())
         : ["2347088246238"],
@@ -51,4 +51,4 @@ console.log(`   📈 CoinGecko: ${config.api.coingecko.baseURL}`);
 console.log(`   ⚽ LiveScore: ${config.api.livescore.baseURL}`);
 console.log('═════════════════════════════════════════════════');
 
-export default config;
+export default settings;
