@@ -1,4 +1,4 @@
-// mega.js (UPDATED - looks for session ID in filename)
+// mega.js (CORRECTED import)
 import * as mega from 'megajs';
 import fs from 'fs';
 import path from 'path';
@@ -15,13 +15,12 @@ class MegaSessionManager {
         try {
             // Check if SESSION_ID is set
             if (!this.sessionId) {
-                throw new Error('SESSION_ID environment variable is not set');
+                console.log('ℹ️  No SESSION_ID set, skipping Mega download');
+                return { success: true, skipped: true };
             }
-            if (!this.masterEmail) {
-                throw new Error('MEGA_MASTER_EMAIL environment variable is not set');
-            }
-            if (!this.masterPassword) {
-                throw new Error('MEGA_MASTER_PASSWORD environment variable is not set');
+            if (!this.masterEmail || !this.masterPassword) {
+                console.log('ℹ️  Mega credentials not set, skipping Mega download');
+                return { success: true, skipped: true };
             }
 
             console.log(`🔍 Looking for files containing: ${this.sessionId}`);
@@ -36,7 +35,8 @@ class MegaSessionManager {
             const matchingFiles = await this.findFilesBySessionId(storage, this.sessionId);
             
             if (matchingFiles.length === 0) {
-                throw new Error(`No files found containing session ID: ${this.sessionId}`);
+                console.log(`ℹ️  No files found containing session ID: ${this.sessionId}`);
+                return { success: true, skipped: true };
             }
 
             // Download the first matching file and rename to creds.json
@@ -54,7 +54,7 @@ class MegaSessionManager {
             };
 
         } catch (error) {
-            console.error('❌ Error:', error.message);
+            console.error('❌ Mega Error:', error.message);
             return {
                 success: false,
                 error: error.message
@@ -66,7 +66,7 @@ class MegaSessionManager {
         return new Promise((resolve, reject) => {
             console.log('🔗 Connecting to MEGA storage...');
 
-            const storage = mega({
+            const storage = new mega.Storage({
                 email: this.masterEmail,
                 password: this.masterPassword,
                 autologin: true
