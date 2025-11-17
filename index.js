@@ -5,11 +5,28 @@ import Bot from './core/bot.js';
 import logger from './utils/logger.js';
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
 import { fileURLToPath } from 'url';
 import MegaSessionManager from './mega.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Create HTTP server FIRST (outside the function)
+const PORT = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+    if (req.url === '/ping') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            status: 'OK',
+            service: 'Savy DNI Bot',
+            time: new Date().toISOString()
+        }));
+    } else {
+        res.writeHead(200);
+        res.end('Savy DNI Bot ✅');
+    }
+});
 
 async function initializeBot() {
     try {
@@ -48,6 +65,7 @@ async function initializeBot() {
         console.log(`   Connected: ${status.isConnected ? "✅" : "❌"}`);
         console.log("   Session: ✅ Found and loaded");
         console.log(`   Commands: ${status.commandCount}`);
+        console.log(`   Ping Server: ✅ Running on port ${PORT}`);
         console.log("\n💡 The bot is now running. Press Ctrl+C to stop.");
         
     } catch (error) {
@@ -82,8 +100,20 @@ function sessionExists() {
 function gracefulShutdown(signal) {
     console.log("\n");
     logger.info(`Received ${signal}, shutting down...`);
-    process.exit(0);
+    server.close(() => {
+        console.log('🛑 HTTP server closed');
+        process.exit(0);
+    });
 }
+
+// Start the HTTP server FIRST
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Ping server running on port ${PORT}`);
+    console.log(`🌐 Uptime check: https://your-app.onrender.com/ping`);
+    
+    // THEN initialize the bot
+    initializeBot();
+});
 
 // Process event handlers
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
@@ -94,6 +124,3 @@ process.on("uncaughtException", (error) => {
 process.on("unhandledRejection", (reason, promise) => {
     logger.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
-
-// Start the application
-initializeBot();
