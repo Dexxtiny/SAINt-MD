@@ -1,5 +1,5 @@
 // mega.js (UPDATED - looks for session ID in filename)
-import mega from 'megajs';
+import * as mega from 'megajs';
 import fs from 'fs';
 import path from 'path';
 
