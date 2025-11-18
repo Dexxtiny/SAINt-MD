@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import { fileURLToPath } from 'url';
-import RedisSessionRestorer from './redis.js'; // Replace Mega with Redis
+import redisSessionRestorer from './redis.js'; // Replace Mega with Redis
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +33,7 @@ async function initializeBot() {
         displayBanner();
         
         // Initialize Redis session restorer
-        const redisRestorer =  RedisSessionRestorer();
+        const redisRestorer =  redisSessionRestorer();
         
         // Check if SESSION_ID is provided in environment
         if (process.env.SESSION_ID) {
