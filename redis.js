@@ -113,5 +113,5 @@ class RedisSessionRestorer {
 }
 
 // Create and export singleton instance
-const redisRestorer = new RedisSessionRestorer();
-export default redisRestorer;
+const redisSessionRestorer = new RedisSessionRestorer();
+export default redisSessionRestorer;
