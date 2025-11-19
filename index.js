@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import Bot from './core/bot.js';
+import SavyDniXBot from './core/bot.js';
 import logger from './utils/logger.js';
 import fs from 'fs';
 import path from 'path';
@@ -70,7 +70,7 @@ async function initializeBot() {
         }
         
         logger.info("Starting Savy DNI Bot...");
-        const bot = new Bot();
+        const bot = new SavyDniXBot();
         await bot.initialize();
         logger.success("✅ Bot is now running and connected to WhatsApp!");
         
