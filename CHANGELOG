@@ -1,0 +1,19 @@
+# Changelog
+
+## [2.4.12] - 2025-11-27
+### Added
+- Background removal with multiple AI methods
+- Temporary email system with inbox checking
+- Interactive menu with button navigation
+- IP geolocation with accurate user detection
+
+### Fixed
+- Location detection showing server IP instead of user IP
+- Email inbox reception issues
+- Menu pagination and session management
+- Image processing reliability
+
+### Changed
+- Improved error handling and fallback mechanisms
+- Enhanced user experience with reaction system
+- Optimized performance and memory usage
