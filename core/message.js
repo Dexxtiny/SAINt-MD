@@ -4,11 +4,10 @@ import logger from '../utils/logger.js';
 const prefix = process.env.PREFIX || '!';
 const ownerNumber = process.env.OWNER_NUMBER + "@s.whatsapp.net";
 
-// Helper to safely extract text from any message type
+// Helper: unwrap and extract text safely
 function extractMessageContent(msg) {
     if (!msg.message) return "";
 
-    // Unwrap ephemeral/viewOnce wrappers
     if (msg.message.ephemeralMessage) {
         msg.message = msg.message.ephemeralMessage.message;
     }
@@ -24,25 +23,28 @@ function extractMessageContent(msg) {
            "";
 }
 
-export default async (sock, m, handler) => {
+export default async (sock, chatUpdate, handler) => {
     try {
-        const msg = m.messages?.[0];
-        if (!msg || msg.key.fromMe) return; // ignore bot’s own messages
+        const msg = chatUpdate.messages?.[0];
+        if (!msg || !msg.message || msg.key.fromMe) return;
+
+        // Ignore status broadcasts
+        if (msg.key.remoteJid === 'status@broadcast') return;
 
         const jid = msg.key.remoteJid;
         const isGroup = jid.endsWith('@g.us');
         const messageContent = extractMessageContent(msg);
 
-        // Ignore if no prefix
         if (!messageContent.startsWith(prefix)) return;
 
-        // Parse command and args
         const args = messageContent.slice(prefix.length).trim().split(/\s+/);
         const commandName = args.shift()?.toLowerCase();
         if (!commandName) return;
 
         const command = handler.getCommand(commandName);
-        if (!command) return;
+        if (!command) {
+            return sock.sendMessage(jid, { text: `❓ Unknown command: ${prefix}${commandName}` }, { quoted: msg });
+        }
 
         // --- Metadata & Permissions ---
         const sender = msg.key.participant || msg.key.remoteJid;
@@ -53,7 +55,7 @@ export default async (sock, m, handler) => {
         let admins = participants.filter(p => p.admin !== null).map(p => p.id);
 
         const isSenderAdmin = admins.includes(sender);
-        const botId = sock.user.id.split(':')[0] + "@s.whatsapp.net";
+        const botId = sock.user?.id?.split(':')[0] + "@s.whatsapp.net";
         const isBotAdmin = admins.includes(botId);
 
         // --- Validation Checks ---
@@ -84,5 +86,9 @@ export default async (sock, m, handler) => {
 
     } catch (error) {
         logger.error("💥 Error in message handler:", error);
+        const jid = chatUpdate.messages?.[0]?.key?.remoteJid;
+        if (jid) {
+            await sock.sendMessage(jid, { text: "⚠️ Oops, something went wrong while processing your command." });
+        }
     }
 };
