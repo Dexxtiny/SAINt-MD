@@ -7,6 +7,8 @@ import makeWASocket, {
     defaultLogger
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
+import pino from 'pino';
+
 
 import CommandHandler from './command.js';
 import messageHandler from './message.js';
@@ -34,7 +36,7 @@ export default async function startSaint() {
         browser: ['Chrome', 'Windows', '10.0'],
         syncFullHistory: false,
         markOnlineOnConnect: true,
-        logger: defaultLogger // ensures Baileys stays quiet
+        logger: pino({ level: 'silent' })// ensures Baileys stays quiet
     });
 
     sock.ev.on('connection.update', (update) => {
