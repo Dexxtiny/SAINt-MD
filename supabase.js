@@ -4,8 +4,8 @@ import path from 'path';
 
 class SupabaseSessionRestorer {
     constructor() {
-        const supabaseUrl = process.env.SUPABASE_URL;
-        const supabaseKey = process.env.SUPABASE_ANON_KEY;
+        const supabaseUrl ='https://gfxqxvbuqykoknglsuss.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmeHF4dmJ1cXlrb2tuZ2xzdXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTY4MzMsImV4cCI6MjA5MDczMjgzM30.zFl2R1bgbKRgr5eLQ-Znxp4ZZegiZYKVUwdSN5fLMzc';
 
         if (!supabaseUrl || !supabaseKey) {
             console.error('❌ Supabase credentials missing in Environment Variables');
