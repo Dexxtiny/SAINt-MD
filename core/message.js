@@ -2,9 +2,7 @@ import 'dotenv/config';
 import logger from '../utils/logger.js';
 
 const prefix = process.env.PREFIX || '!';
-const ownerNumber = process.env.OWNER_NUMBER + "@s.whatsapp.net";
 
-// Helper: unwrap and extract text safely
 function extractMessageContent(msg) {
     if (!msg.message) return "";
 
@@ -31,10 +29,7 @@ export default async (sock, chatUpdate, handler) => {
         // Ignore status broadcasts
         if (msg.key.remoteJid === 'status@broadcast') return;
 
-        const jid = msg.key.remoteJid;
-        const isGroup = jid.endsWith('@g.us');
         const messageContent = extractMessageContent(msg);
-
         if (!messageContent.startsWith(prefix)) return;
 
         const args = messageContent.slice(prefix.length).trim().split(/\s+/);
@@ -43,46 +38,16 @@ export default async (sock, chatUpdate, handler) => {
 
         const command = handler.getCommand(commandName);
         if (!command) {
-            return sock.sendMessage(jid, { text: `❓ Unknown command: ${prefix}${commandName}` }, { quoted: msg });
+            return sock.sendMessage(msg.key.remoteJid, { 
+                text: `❓ Unknown command: ${prefix}${commandName}` 
+            }, { quoted: msg });
         }
 
-        // --- Metadata & Permissions ---
-        const sender = msg.key.participant || msg.key.remoteJid;
-        const isOwner = sender === ownerNumber;
+        // Log command execution
+        logger.info(`⚡ Command "${commandName}" received from ${msg.key.remoteJid}`);
 
-        let groupMetadata = isGroup ? await sock.groupMetadata(jid).catch(() => null) : null;
-        let participants = groupMetadata?.participants || [];
-        let admins = participants.filter(p => p.admin !== null).map(p => p.id);
-
-        const isSenderAdmin = admins.includes(sender);
-        const botId = sock.user?.id?.split(':')[0] + "@s.whatsapp.net";
-        const isBotAdmin = admins.includes(botId);
-
-        // --- Validation Checks ---
-        if (command.ownerOnly && !isOwner) {
-            return sock.sendMessage(jid, { text: "❌ This command is restricted to the Bot Owner." }, { quoted: msg });
-        }
-        if (command.groupOnly && !isGroup) {
-            return sock.sendMessage(jid, { text: "❌ This command can only be used in groups." }, { quoted: msg });
-        }
-        if (command.adminOnly && !isSenderAdmin && !isOwner) {
-            return sock.sendMessage(jid, { text: "❌ You must be a group admin to use this." }, { quoted: msg });
-        }
-        if (command.botAdminRequired && !isBotAdmin) {
-            return sock.sendMessage(jid, { text: "❌ I need to be an admin to perform this action." }, { quoted: msg });
-        }
-
-        // --- Execute Command ---
-        logger.info(`⚡ Command "${commandName}" executed by ${sender} in ${isGroup ? 'Group' : 'Private'}`);
-
-        await command.execute(sock, msg, {
-            args,
-            isGroup,
-            isOwner,
-            isAdmin: isSenderAdmin,
-            isBotAdmin,
-            payload: messageContent
-        });
+        // 👉 Pass in (message, client, args) exactly in that order
+        await command.execute(msg, sock, args);
 
     } catch (error) {
         logger.error("💥 Error in message handler:", error);
