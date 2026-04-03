@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import logger from "../../utils/logger.js";
+import logger from "../utils/logger.js";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
