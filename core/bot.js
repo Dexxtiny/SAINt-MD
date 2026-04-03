@@ -87,4 +87,5 @@ async function startBot() {
 }
 
 // Run bot
-startBot();
+
+export default savydnixbot;
