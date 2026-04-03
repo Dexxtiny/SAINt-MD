@@ -59,6 +59,7 @@ export default async function startSaint() {
             sock.sendMessage(process.env.OWNER_NUMBER + "@s.whatsapp.net", {
                 text: "🚀 *Saint MD is now connected successfully!* 🎉\n\nStay updated by joining our official channel 👇\n\https://whatsapp.com/channel/0029VbCoGmm8kyyJg9kcBV3m"    
         });
+        }
     });
 
     sock.ev.on('creds.update', saveCreds);
@@ -85,6 +86,8 @@ export default async function startSaint() {
             console.log("\x1b[34m%s\x1b[0m", `📩 [Saint MD] Command Received: ${prefix}${commandName}`);
             await messageHandler(sock, m, handler);
         }
+        else 
+            console.log("\x1b[36m%s\x1b[0m", `💬 Message Received from ${msg.key.remoteJid}: "${messageContent}"`);
     });
 
     return sock;
