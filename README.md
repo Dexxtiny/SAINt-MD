@@ -1,160 +1,186 @@
 
-\<div align="center"\>
 
-\<img src="[https://i.imgur.com/dBaSKWF.gif](https://i.imgur.com/dBaSKWF.gif)" height="20" width="100%"\>
 
-<br>
+<div align="center">
+  <img src="https://capsule-render.vercel.app/api?type=speech&height=200&color=gradient&text=saint%20Md%20🥳&animation=blinking&fontAlign=36&fontAlignY=36&descAlign=62&reversal=true&textBg=false" width="100%">
+</div>
 
-[](https://git.io/typing-svg)
+<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Black+Ops+One&size=70&pause=500&color=00FF00&center=true&width=1150&height=200&lines=PLEASE-FORK-STAR-BOT-REPO" alt="Typing SVG" /></a>
+  </div>
+<a><img src='https://i.ibb.co/VWt5CXzX/malvin-xd.jpg'/></a>
 
-<br>
+<!-- 📊 STATS & HERO ANIMATION (Updated Colors) -->
+<div align="center">
 
-\<img src="[https://capsule-render.vercel.app/render?type=waving\&color=00F2FF\&height=200\&section=header\&text=SAINT%20MD\&fontSize=90\&animation=fadeIn\&fontAlignY=40](https://www.google.com/search?q=https://capsule-render.vercel.app/render%3Ftype%3Dwaving%26color%3D00F2FF%26height%3D200%26section%3Dheader%26text%3DSAINT%2520MD%26fontSize%3D90%26animation%3DfadeIn%26fontAlignY%3D40)" width="100%"\>
+  <!-- GitHub Stats/Dexxtiny/SAINt-MD/b
+  <p>
+    <img src="https://img.shields.io/github/forks/Dexxtiny/SAINt-MD?style=flat&color=1E88E5&logo=github&logoColor=white&label=Forks" alt="GitHub Forks" />
+    <img src="https://img.shields.io/github/followers/slick-lab?style=flat&color=43A047&logo=github&logoColor=white&label=Followers" alt="GitHub Followers" />
+    <img src="https://img.shields.io/github/last-commit/Dexxtiny/SAINt-MD?style=flat&color=8E24AA&logo=git&logoColor=white&label=Last%20Commit" alt="Last Commit" />
+    <img src="https://img.shields.io/github/repo-size/XdKing2/SAINt-MD?style=flat&color=0097A7&logo=database&logoColor=white&label=Repo%20Size" alt="Repo Size" />
+    <img src="https://img.shields.io/github/package-json/v/Dexxtiny/SAINt-MD?style=flat&color=F57C00&logo=npm&logoColor=white&label=Version" alt="Package Version" />
+  </p>
 
-<br><br>
+  <!-- Hero GIF with updated border & hover effect -->
+  <p>
+    <img src="https://i.imgur.com/LyHic3i.gif" alt="Techwave Animation" style="max-width:100%; border-radius:16px; transition: transform 0.3s ease-in-out;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'" />
+  </p>
 
-[](https://www.google.com/search?q=https://github.com/Saint-MD/saint-md-v3/stargazers)
-[](https://www.google.com/search?q=https://github.com/Saint-MD/saint-md-v3/network/members)
-[](https://whatsapp.com/channel/0029VbCoGmm8kyyJg9kcBV3m)
+</div>
+<div align="center">
 
-<br>
+<h1 align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=30&duration=6000&color=00FF00&background=000000&center=true&vCenter=true&width=600&lines=⚡+SAINT+MD+BETTER+OPTION;🔥+THE+MOST+POWERFUL+WHATSAPP+BOT;💻+DEVELOPER+BY+slick+phantom;🚀+saint-md+SOLUTIONS;🌈+FAST+⚡+SECURE+🔒+RELIABLE+✅" alt="Typing Animation">
+</h1>
 
-**A premium, high-performance WhatsApp bot. 100+ Commands, Advanced AI, Group Automation, and Professional Logging — Engineered with Node.js & Baileys.**
 
-\<img src="[https://i.imgur.com/dBaSKWF.gif](https://i.imgur.com/dBaSKWF.gif)" height="20" width="100%"\>
+***BOT FEATURE ⤵️***
 
-\</div\>
+| Menu ⁠➜ | Status Save + Send | Group | ChatBot | Downloading | Antidelete | Ai | Viewonce | Fun | Status Reply | Status Reacts | HeartReacts | Autoreacts | Call Rejecter 
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Work ➜ |✅|✅|✅|✅|✅|✅|✅|✅|✅|✅|✅|✅|✅|
 
------
 
-## ⚡ Quick Start & Deployment
+<p align="center">
+<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Rubik+Dirt&size=65&pause=1000&color=00FF00&background=FF20A500&center=true&vCenter=true&width=1000&height=150&lines=saint-Md;Saint+slick;THANKS+FOR+USING" alt="Typing SVG" /></a>
+</p>
 
-\<div align="center"\>
+### 🚀 Fork the Repository
 
-### 🛠️ Step 1: Authentication (Pairing)
+<p align='center'>
 
-Before deploying, you must link your WhatsApp to get your session credentials.
+ [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=monospace-ExtraBold&color=blue&lines=𝗙𝗢𝗥𝗞+𝗔𝗡𝗗+𝗦𝗧𝗔𝗥+⭐+𝗥𝗘𝗣𝗢)](https://git.io/typing-svg)
 
-\<a href="[https://saint-md-pair.onrender.com/](https://saint-md-pair.onrender.com/)"\>
-\<img src="[https://img.shields.io/badge/](https://img.shields.io/badge/)🔗 GET PAIR CODE-Click Here-00F2FF?style=for-the-badge\&labelColor=0d1117\&color=00F2FF" alt="Get Pair Code" height="40"\>
-\</a\>
+<a href="https://github.com/Dexxtiny/SAINT-MD/fork"><img src="https://img.shields.io/github/forks/XdKing2/SAINT-MD?style=for-the-badge&logo=github&color=4c1&label=Fork%20MALVIN-XD" alt="Fork SAINT-MD" /></a>
 
-<br><br>
+</div>
+<!-- Glowing Header -->
+<p align="center">
+  <img src="https://i.imgur.com/dBaSKWF.gif" height="40" width="100%">
+</p>
 
-### 📥 Step 2: Get Your Session
 
-Once paired, download your pre-configured entry file.
 
-\<a href="[https://saint-md-pair.onrender.com/session](https://saint-md-pair.onrender.com/session)"\>
-\<img src="[https://img.shields.io/badge/](https://img.shields.io/badge/)💾 DOWNLOAD INDEX.JS-Get Session File-FF4B4B?style=for-the-badge\&labelColor=0d1117\&color=FF4B4B" alt="Download Session" height="40"\>
-\</a\>
+Authenticate using the *web button* below to generate your `Session ID`.
 
-<br><br>
+### 🌐 Session Web ⤵️
 
-### 🚀 Step 3: Deploy to Your Platform
+<div align="center">
 
-Upload the downloaded `index.js` and your bot files to any of these providers:
+> fast Authentication
 
-\<table\>
-\<tr\>
-\<td align="center" width="200"\>
-\<a href="[https://render.com](https://render.com)"\>
-\<img src="[https://img.shields.io/badge/RENDER-Deploy-46E3B7?style=for-the-badge\&logo=render\&logoColor=white](https://www.google.com/search?q=https://img.shields.io/badge/RENDER-Deploy-46E3B7%3Fstyle%3Dfor-the-badge%26logo%3Drender%26logoColor%3Dwhite)" height="35"\>
-\</a\><br>\<b\>✨ Render\</b\><br>\<sub\>Top Free Choice\</sub\>
-\</td\>
-\<td align="center" width="200"\>
-\<a href="[https://railway.app](https://railway.app)"\>
-\<img src="[https://img.shields.io/badge/RAILWAY-Deploy-0B0D0E?style=for-the-badge\&logo=railway\&logoColor=white](https://www.google.com/search?q=https://img.shields.io/badge/RAILWAY-Deploy-0B0D0E%3Fstyle%3Dfor-the-badge%26logo%3Drailway%26logoColor%3Dwhite)" height="35"\>
-\</a\><br>\<b\>🚂 Railway\</b\><br>\<sub\>High Speed\</sub\>
-\</td\>
-\<td align="center" width="200"\>
-\<a href="[https://koyeb.com](https://koyeb.com)"\>
-\<img src="[https://img.shields.io/badge/KOYEB-Deploy-121212?style=for-the-badge\&logo=koyeb\&logoColor=white](https://www.google.com/search?q=https://img.shields.io/badge/KOYEB-Deploy-121212%3Fstyle%3Dfor-the-badge%26logo%3Dkoyeb%26logoColor%3Dwhite)" height="35"\>
-\</a\><br>\<b\>🟡 Koyeb\</b\><br>\<sub\>24/7 Always On\</sub\>
-\</td\>
-\</tr\>
-\<tr\>
-\<td align="center" width="200"\>
-\<a href="[https://lunes.host](https://lunes.host)"\>
-\<img src="[https://img.shields.io/badge/LUNES\_HOST-Deploy-5865F2?style=for-the-badge\&logo=discord\&logoColor=white](https://www.google.com/search?q=https://img.shields.io/badge/LUNES_HOST-Deploy-5865F2%3Fstyle%3Dfor-the-badge%26logo%3Ddiscord%26logoColor%3Dwhite)" height="35"\>
-\</a\><br>\<b\>🌙 Lunes Host\</b\><br>\<sub\>Premium VPS\</sub\>
-\</td\>
-\<td align="center" width="200"\>
-\<a href="[https://katabump.com](https://katabump.com)"\>
-\<img src="[https://img.shields.io/badge/KATABUMP-Deploy-FF0000?style=for-the-badge\&logo=linux\&logoColor=white](https://www.google.com/search?q=https://img.shields.io/badge/KATABUMP-Deploy-FF0000%3Fstyle%3Dfor-the-badge%26logo%3Dlinux%26logoColor%3Dwhite)" height="35"\>
-\</a\><br>\<b\>🛡️ Katabump\</b\><br>\<sub\>Bulletproof VPS\</sub\>
-\</td\>
-\<td align="center" width="200"\>
-\<a href="[https://github.com/Saint-MD/saint-md-v3/fork](https://www.google.com/search?q=https://github.com/Saint-MD/saint-md-v3/fork)"\>
-\<img src="[https://img.shields.io/badge/FORK\_REPO-Github-white?style=for-the-badge\&logo=github\&logoColor=black](https://www.google.com/search?q=https://img.shields.io/badge/FORK_REPO-Github-white%3Fstyle%3Dfor-the-badge%26logo%3Dgithub%26logoColor%3Dblack)" height="35"\>
-\</a\><br>\<b\>🍴 Fork Repo\</b\><br>\<sub\>Custom Build\</sub\>
-\</td\>
-\</tr\>
-\</table\>
+[![Get Pairing Code](https://img.shields.io/badge/Get%20Pairing%20Code-orange?style=for-the-badge&logo=opencv&logoColor=black)](https://saint-md-pair.onrender.com/)
 
-\</div\>
 
------
+</div>
+<!-- Glowing Header -->
+<p align="center">
+  <img src="https://i.imgur.com/dBaSKWF.gif" height="40" width="100%">
+</p>
 
-## ✨ Features Spotlight
 
-\<details\>
-\<summary\>\<b\>🌍 Global System\</b\>\</summary\>
-<br>
+<details>
+<summary>_📡 DEPLOYMENT_</summary>
+ 
 
-  - ⚡ \<b\>Ultra Fast:\</b\> Optimized with Baileys Multi-Device.
-  - 🛠️ \<b\>Modular:\</b\> Hot-reload commands without restarting.
-  - 🛡️ \<b\>Security:\</b\> Advanced Admin & Owner verification.
-  - 💬 \<b\>Themes:\</b\> Support for 15+ custom character personalities.
-    \</details\>
 
-\<details\>
-\<summary\>\<b\>📥 Media Downloader\</b\>\</summary\>
-<br>
+<div align="center">
+  <table>
+    <tr>
+      <td><a href="https://host.talkdrove.com/dashboard/deploy-bot/75" target="_blank"><img src="https://img.shields.io/badge/TalkDrove-A52A2A?style=for-the-badge&logo=github&logoColor=white&labelColor=000000"/></a></td>
+    </tr>
+    <tr>
+      <td><a href="https://railway.app/new" target="_blank"><img src="https://img.shields.io/badge/Railway-FF8700?style=for-the-badge&logo=railway&logoColor=white&labelColor=000000"/></a></td>
+    </tr>
+    <tr>
+      <td><a href="https://dashboard.render.com/web/new" target="_blank"><img src="https://img.shields.io/badge/Render-000000?style=for-the-badge&logo=render&logoColor=white&labelColor=000000&color=00ffaa"/></a></td>
+      <td><a href="http://mxd-1768768d6768.herokuapp.com" target="_blank"><img src="https://img.shields.io/badge/MINI DEPLOY-CC00FF?style=for-the-badge&logo=huggingface&logoColor=white&labelColor=000000"/></a></td>
+    </tr>
+    <tr>
+       <td><a href="https://dashboard.katabump.com/auth/login#3b6566"target="_blank"><img src="https://img.shields.io/badge/KATABUMP-Deploy-FF0000?style=for-the-badge&logo=linux&logoColor=white&labelColor=0d1117"/></a></td>
+    <td><a href="https://betadash.lunes.host"><img src="https://img.shields.io/badge/LUNES_HOST-Deploy-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=0d1117"/></a></td>
+</tr>
 
-  - 📺 \<b\>YouTube:\</b\> Play/Video directly in chat.
-  - 🎵 \<b\>Spotify:\</b\> Search and download tracks.
-  - 📸 \<b\>Instagram/FB:\</b\> One-click Reels & Post downloads.
-  - 📽️ \<b\>TikTok:\</b\> No-watermark video extraction.
-    \</details\>
+  </table>
+</div>
 
-\<details\>
-\<summary\>\<b\>👥 Group Management\</b\>\</summary\>
-<br>
+</details>
 
-  - 🚫 \<b\>Anti-Link:\</b\> Auto-delete unauthorized links.
-  - 👮 \<b\>Auto-Admin:\</b\> Automated promotion/demotion tools.
-  - 📢 \<b\>Tag All:\</b\> Mention every member instantly.
-  - 👋 \<b\>Welcome/Exit:\</b\> Beautiful custom greetings.
-    \</details\>
+</div>
+<!-- Glowing Header -->
+<p align="center">
+  <img src="https://i.imgur.com/dBaSKWF.gif" height="40" width="100%">
+</p>
 
------
 
-## ⚙️ Environment Configuration
+<details>
+<summary>📡 PANEL DEPLOYMENT OPTIONS</summary>
+ 
+ **• 𝗛𝗢𝗦𝗧 𝗢𝗡 𝗗𝗜𝗦𝗖𝗢𝗥𝗗 /PANEL**
 
-| Key | Description | Example |
-|---|---|---|
-| `SESSION_ID` | Your generated session key | `SAINT_MD_...` |
-| `PREFIX` | Command trigger | `.` or `!` |
-| `OWNER_NUMBER` | Your number with country code | `23480...` |
-| `BOT_NAME` | Name shown in menu | `Saint MD` |
+> Get the latest MALVIN-XD bot zip file for panel-based deployment:
 
------
+<div align="left">
+  <a href="https://github.com/XdKing2/MALVIN-XD/archive/refs/heads/main.zip" target="_blank">
+    <img alt="Download Panel ZIP" src="https://img.shields.io/badge/View-panel%20Codes-FF0000?style=for-the-badge&logo=bot&logoColor=white"/>
+  </a>
+</div>
 
-## 🤝 Join the Community
+<p align="center">
+  <img src="https://i.imgur.com/LyHic3i.gif" width="100%" />
+</p>
 
-\<div align="center"\>
+> ✅ Deploy to any panel service of your choice.
 
-**Stay updated with the latest plugins and features.**
+<p align="center">
+  <img src="https://i.imgur.com/LyHic3i.gif" alt="divider"/>
+</p>
 
-[](https://whatsapp.com/channel/0029VbCoGmm8kyyJg9kcBV3m)
+### 🛠️ VPS / Hosting Panels
 
-<br>
+<div align="center">
+  <table>
+    <tr>
+      <td>
+        <a href="https://bot-hosting.net/?aff=1097457675723341836" target="_blank">
+          <img src="https://img.shields.io/badge/BotHosting-8A2BE2?style=for-the-badge&logo=vercel&logoColor=white&labelColor=1a1a1a"/>
+        </a>
+      </td>
+      <td>
+        <a href="https://dashboard.katabump.com/auth/login#203630" target="_blank">
+          <img src="https://img.shields.io/badge/Katabump-FF5722?style=for-the-badge&logo=codeberg&logoColor=white&labelColor=1a1a1a"/>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <a href="https://dash.hmvhostings.com/register?ref=GKTSTyFY" target="_blank">
+          <img src="https://img.shields.io/badge/HMVHosting-00ACC1?style=for-the-badge&logo=cloudflare&logoColor=white&labelColor=1a1a1a"/>
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
 
-**Developed with ❤️ by the Saint MD Team**
 
-\<img src="[https://i.imgur.com/dBaSKWF.gif](https://i.imgur.com/dBaSKWF.gif)" height="20" width="100%"\>
 
-\<sub\>"Elevating WhatsApp Automation to an Art Form."\</sub\>
+</details>
+</div>
+<!-- Glowing Header -->
+<p align="center">
+  <img src="https://i.imgur.com/dBaSKWF.gif" height="40" width="100%">
+</p>
 
-\</div\>
+
+</div>
+<!-- Glowing Header -->
+<p align="center">
+  <img src="https://i.imgur.com/dBaSKWF.gif" height="40" width="100%">
+</p>
+
+</div>
+<!-- Glowing Header -->
+<p align="center">
+  <img src="https://i.imgur.com/dBaSKWF.gif" height="40" width="100%">
+</p>
+
