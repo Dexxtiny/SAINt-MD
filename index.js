@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import startSaint from './bot.js'; // Points to your new modular bot file
+import startSaint from './core/bot.js'; // Points to your new modular bot file
 // import logger from './utils/logger.js'; // Use if you have a logger, otherwise use console
 import fs from 'fs';
 import path from 'path';
