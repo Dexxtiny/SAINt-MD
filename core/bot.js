@@ -1,91 +1,75 @@
-// bot.js
-import {
-  makeWASocket,
-  fetchLatestBaileysVersion,
-  Browsers,
-  useSingleFileAuthState,
-  makeCacheableSignalKeyStore,
-} from "@whiskeysockets/baileys";
-import CommandHandler from "./handlers/command.js";
-import MessageHandler from "./handlers/message.js";
-import pino from "pino";
-import logger from "./utils/logger.js";
+import 'dotenv/config';
+import makeWASocket, { 
+    useMultiFileAuthState, 
+    DisconnectReason, 
+    fetchLatestBaileysVersion,
+    makeCacheableSignalKeyStore
+} from '@whiskeysockets/baileys';
+import { Boom } from '@hapi/boom';
 
-async function startBot() {
-  try {
-    logger.info("🚀 Starting WhatsApp Bot...");
+// Imports from the same directory
+import CommandHandler from './CommandHandler.js';
+import messageHandler from './message.js';
 
-    // Ensure creds.json exists
-    const { state, saveState } = useSingleFileAuthState("./session/creds.json");
-    if (!state || !state.creds) {
-      logger.error("❌ No creds.json found in session folder. Please log in first.");
-      return;
-    }
+export default async function startSaint() {
+    console.log("\x1b[36m%s\x1b[0m", "--------------------------------------------------");
+    console.log("\x1b[35m%s\x1b[0m", "✨ SAINT MD: STARTING UP...");
+    console.log("\x1b[36m%s\x1b[0m", "--------------------------------------------------");
 
-    // Fetch latest Baileys version (fallback if fails)
-    let version;
-    try {
-      version = await fetchLatestBaileysVersion();
-    } catch (error) {
-      logger.warn("⚠️ Failed to fetch latest version, using fallback");
-      version = { version: [4, 0, 0] };
-    }
+    const handler = new CommandHandler();
+    await handler.loadCommands();
 
-    // Create WhatsApp client
-    const client = makeWASocket({
-      version: version.version || [4, 0, 0],
-      auth: {
-        creds: state.creds,
-        keys: makeCacheableSignalKeyStore(
-          state.keys,
-          pino({ level: "fatal" }).child({ level: "fatal" })
-        ),
-      },
-      logger: pino({ level: "silent" }),
-      browser: Browsers.ubuntu("Firefox"),
-      markOnlineOnConnect: true,
-      generateHighQualityLinkPreview: true,
-      defaultQueryTimeoutMs: 60000,
-      connectTimeoutMs: 60000,
+    const { state, saveCreds } = await useMultiFileAuthState('sessions');
+    const { version } = await fetchLatestBaileysVersion();
+
+    const sock = makeWASocket({
+        version,
+        auth: {
+            creds: state.creds,
+            keys: makeCacheableSignalKeyStore(state.keys),
+        },
+        browser: ['Saint MD', 'Safari', '3.0.0'],
+        syncFullHistory: false,
+        markOnlineOnConnect: true
     });
 
-    // Save updated creds automatically
-    client.ev.on("creds.update", saveState);
-
-    // Initialize handlers
-    const bot = { client };
-    const commandHandler = new CommandHandler();
-    await commandHandler.loadCommands();
-
-    const messageHandler = new MessageHandler(bot, commandHandler);
-    messageHandler.initialize();
-
-    logger.info(`✅ Bot initialized with ${commandHandler.getAllCommands().length} commands`);
-
-    // Connection events
-    client.ev.on("connection.update", (update) => {
-      const { connection, lastDisconnect } = update;
-
-      if (connection === "open") {
-        logger.info("✅ Connected to WhatsApp successfully!");
-      }
-
-      if (connection === "close") {
-        const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== 401;
-        logger.warn(`Connection closed. Reconnect: ${shouldReconnect}`);
-        if (shouldReconnect) {
-          setTimeout(() => {
-            logger.info("🔄 Attempting to reconnect...");
-            startBot().catch((err) => logger.error("Reconnection failed:", err));
-          }, 5000);
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update;
+        if (connection === 'close') {
+            const reason = new Boom(lastDisconnect?.error)?.output.statusCode;
+            if (reason !== DisconnectReason.loggedOut) {
+                console.log("\x1b[33m%s\x1b[0m", "♻️ Saint MD: Connection lost. Reconnecting...");
+                startSaint(); 
+            }
+        } else if (connection === 'open') {
+            console.log("\x1b[36m%s\x1b[0m", "--------------------------------------------------");
+            console.log("\x1b[32m%s\x1b[0m", "✅ SAINT MD IS ONLINE");
+            console.log(`🤖 Bot       : Saint MD`);
+            console.log(`📡 Prefix    : ${process.env.PREFIX}`);
+            console.log("\x1b[36m%s\x1b[0m", "--------------------------------------------------");
         }
-      }
     });
-  } catch (error) {
-    logger.error("❌ Error starting bot:", error);
-  }
+
+    sock.ev.on('creds.update', saveCreds);
+
+    sock.ev.on('messages.upsert', async (m) => {
+        const msg = m.messages[0];
+        if (!msg.message || msg.key.fromMe) return;
+
+        const messageContent = msg.message?.conversation || 
+                               msg.message?.extendedTextMessage?.text || 
+                               msg.message?.imageMessage?.caption || "";
+
+        const prefix = process.env.PREFIX || "!";
+
+        // Log the command receipt
+        if (messageContent.startsWith(prefix)) {
+            const commandName = messageContent.slice(prefix.length).trim().split(/ +/)[0].toLowerCase();
+            console.log("\x1b[34m%s\x1b[0m", `📩 [Saint MD] Command Received: ${prefix}${commandName}`);
+            
+            await messageHandler(sock, m, handler);
+        }
+    });
+
+    return sock;
 }
-
-// Run bot
-
-export default savydnixbot;
