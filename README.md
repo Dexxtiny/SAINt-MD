@@ -51,7 +51,7 @@
 
  [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=monospace-ExtraBold&color=blue&lines=𝗙𝗢𝗥𝗞+𝗔𝗡𝗗+𝗦𝗧𝗔𝗥+⭐+𝗥𝗘𝗣𝗢)](https://git.io/typing-svg)
 
-<a href="https://github.com/Dexxtiny/SAINT-MD/fork"><img src="https://img.shields.io/github/forks/XdKing2/SAINt-MD?style=for-the-badge&logo=github&color=4c1&label=Fork%20Saint-MD" alt="Fork SAINT-MD" /></a>
+<a href="https://github.com/Dexxtiny/SAINt-MD/fork"><img src="https://img.shields.io/github/forks/Dexxtiny/SAINt-MD?style=for-the-badge&logo=github&color=4c1&label=Fork%20Saint-MD" alt="Fork SAINT-MD" /></a>
 
 </div>
 <!-- Glowing Header -->
