@@ -2,9 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const settings = {
-    authorizedNumbers: process.env.AUTHORIZED_NUMBER 
-        ? process.env.OWNER_NUMBER.split(',').map(a => a.trim())
-        : ["2347088246238"],
+    authorizedNumbers: process.env.OWNER_NUMBER,
     
     bot: {
         name: "Savy DNI",
