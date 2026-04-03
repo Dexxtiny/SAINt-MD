@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
-import SavyDniXBot from './core/bot.js';
-import logger from './utils/logger.js';
+import 'dotenv/config';
+import startSaint from './bot.js'; // Points to your new modular bot file
+// import logger from './utils/logger.js'; // Use if you have a logger, otherwise use console
 import fs from 'fs';
 import path from 'path';
 import http from 'http';
@@ -13,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
 
-// HTTP Server for Uptime Checks
+// HTTP Server for Uptime Checks (Keeps bot alive on Render/Koyeb)
 const server = http.createServer((req, res) => {
     if (req.url === '/ping') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -24,7 +22,7 @@ const server = http.createServer((req, res) => {
         }));
     } else {
         res.writeHead(200);
-        res.end('SAINT MD ✅');
+        res.end('SAINT MD IS ACTIVE ✅');
     }
 });
 
@@ -34,88 +32,73 @@ async function initializeBot() {
         
         const supabaseRestorer = supabaseSessionRestorer;
         
+        // 1. Supabase Session Restoration
         if (process.env.SESSION_ID) {
-            console.log(`🔍 Supabase: Attempting to restore session [${process.env.SESSION_ID}]`);
+            console.log(`\x1b[34m%s\x1b[0m`, `🔍 Supabase: Attempting to restore session [${process.env.SESSION_ID}]`);
             const restoreResult = await supabaseRestorer.restoreSession();
             
             if (restoreResult.success) {
-                console.log(`✅ Supabase: Session restored successfully!`);
+                console.log(`\x1b[32m%s\x1b[0m`, `✅ Supabase: Session restored successfully!`);
             } else {
-                console.log(`❌ Supabase: Restore failed: ${restoreResult.error}`);
+                console.log(`\x1b[33m%s\x1b[0m`, `❌ Supabase: Restore failed: ${restoreResult.error}`);
                 console.log("💡 Falling back to local session check...");
             }
-        } else {
-            console.log("ℹ️ No SESSION_ID in .env, checking local /sessions/ folder...");
         }
-        
-        // Wait a brief moment for filesystem sync if needed
+
+        // 2. Check if creds.json actually exists now
         if (!sessionExists()) {
-            console.log("\n❌ Authentication Failure: No WhatsApp session found.");
+            console.log("\x1b[31m%s\x1b[0m", "\n❌ Authentication Failure: No WhatsApp session found.");
             console.log("💡 Fixes:");
             console.log("   1. Check your Supabase credentials (URL/KEY)");
             console.log("   2. Ensure SESSION_ID matches an ID in your Supabase bucket");
             console.log("   3. Or manually place creds.json in: ./sessions/");
             
+            // Helpful search for available sessions
             const availableSessions = await supabaseRestorer.searchSessions();
             if (availableSessions && availableSessions.length > 0) {
                 console.log("\n📋 Found these Session IDs in Supabase:");
                 availableSessions.forEach(session => {
                     console.log(`   📁 ID: ${session.sessionId}`);
                 });
-                console.log("\n💡 Set one of these as your SESSION_ID in your hosting environment.");
             }
-            
-            // Clean up connection before exit
-            if (supabaseRestorer.close) await supabaseRestorer.close();
             process.exit(1);
         }
         
-        logger.info("Initializing Savy DNI Bot Core...");
-        const bot = new SavyDniXBot();
-        await bot.initialize();
+        // 3. Start the Core Saint MD Bot
+        console.log("\x1b[35m%s\x1b[0m", "🚀 INITIALIZING SAINT MD CORE...");
         
-        logger.success("🚀 SUCCESS: Bot is connected to WhatsApp!");
-        
-        const status = bot.getStatus();
-        console.log("\n📊 SYSTEM REPORT:");
-        console.log(`   Connection:  ${status.isConnected ? "CONNECTED ✅" : "DISCONNECTED ❌"}`);
-        console.log(`   Source:      ${process.env.SESSION_ID ? "Cloud (Supabase)" : "Local Storage"}`);
-        console.log(`   Commands:    ${status.commandCount} loaded`);
-        console.log(`   Web Server:  Port ${PORT} ✅`);
-        
-        // Only close if your Supabase restorer has a close method (usually not needed for Supabase JS client)
-        if (supabaseRestorer.close) await supabaseRestorer.close();
+        // This calls the export default function from your bot.js
+        await startSaint();
         
     } catch (error) {
-        logger.error("FATAL ERROR during startup:", error.message);
+        console.error("\x1b[31m%s\x1b[0m", "FATAL ERROR during startup:", error.message);
         process.exit(1);
     }
 }
 
 function displayBanner() {
-    console.log("\n" + "═".repeat(50));
-    console.log("🤖        SAINT MD WHATSAPP BOT (Supabase Edition)      🤖");
-    console.log("═".repeat(50));
+    console.log("\x1b[36m%s\x1b[0m", "\n" + "═".repeat(50));
+    console.log("\x1b[36m%s\x1b[0m", "🤖          SAINT MD WHATSAPP BOT (PRO)          🤖");
+    console.log("\x1b[36m%s\x1b[0m", "═".repeat(50));
 }
 
 function sessionExists() {
-    // Ensure the path points to where your supabase.js downloads the file
+    // Looks for sessions/creds.json in the current directory
     const sessionPath = path.join(__dirname, "sessions", "creds.json");
     return fs.existsSync(sessionPath);
 }
 
 function gracefulShutdown(signal) {
     console.log("\n");
-    logger.info(`Shutting down (Signal: ${signal})...`);
+    console.log(`\x1b[33m%s\x1b[0m`, `🛑 Shutting down (Signal: ${signal})...`);
     server.close(() => {
-        console.log('🛑 HTTP Server Offline');
         process.exit(0);
     });
 }
 
 // Start HTTP server then Init Bot
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Uptime service active on port ${PORT}`);
+    console.log(`\x1b[32m%s\x1b[0m`, `📡 Uptime service active on port ${PORT}`);
     initializeBot();
 });
 
@@ -123,8 +106,8 @@ server.listen(PORT, '0.0.0.0', () => {
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("uncaughtException", (error) => {
-    logger.error("UNCAUGHT EXCEPTION:", error);
+    console.error("UNCAUGHT EXCEPTION:", error);
 });
-process.on("unhandledRejection", (reason, promise) => {
-    logger.error("UNHANDLED REJECTION:", reason);
+process.on("unhandledRejection", (reason) => {
+    console.error("UNHANDLED REJECTION:", reason);
 });
