@@ -57,13 +57,7 @@ export default async function startSaint() {
 
             // Send welcome with channel button
             sock.sendMessage(process.env.OWNER_NUMBER + "@s.whatsapp.net", {
-                text: "🚀 *Saint MD is now connected successfully!* 🎉\n\nStay updated by joining our official channel 👇",
-                footer: "Saint MD Bot",
-                buttons: [
-                    { buttonId: "join_channel", buttonText: { displayText: "📢 Join Channel" }, type: 1 }
-                ],
-                headerType: 1
-            });
+                text: "🚀 *Saint MD is now connected successfully!* 🎉\n\nStay updated by joining our official channel 👇\n\https://whatsapp.com/channel/0029VbCoGmm8kyyJg9kcBV3m"    
         }
     });
 
