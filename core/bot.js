@@ -1,94 +1,152 @@
-import 'dotenv/config';
-import makeWASocket, { 
-    useMultiFileAuthState, 
-    DisconnectReason, 
-    fetchLatestBaileysVersion,
-    makeCacheableSignalKeyStore
-} from '@whiskeysockets/baileys';
-import { Boom } from '@hapi/boom';
+import makeWASocket, { DisconnectReason, fetchLatestBaileysVersion, useMultiFileAuthState, jidDecode } from '@whiskeysockets/baileys';
 import pino from 'pino';
+import { Boom } from '@hapi/boom';
+import fs from 'fs';
+import chalk from 'chalk';
 
-
-import CommandHandler from './command.js';
+import CommandHandler from './CommandHandler.js';
 import messageHandler from './message.js';
 
-export default async function startSaint() {
-    console.log("\x1b[36m%s\x1b[0m", "💠--------------------------------------------------💠");
-    console.log("\x1b[35m%s\x1b[0m", "✨ SAINT MD: Igniting the engines...");
-    console.log("\x1b[36m%s\x1b[0m", "💠--------------------------------------------------💠");
+async function startSaint() {
+    try {
+        const { state, saveCreds } = await useMultiFileAuthState('./sessions');
+        const { version } = await fetchLatestBaileysVersion();
+        const handler = new CommandHandler();
+        await handler.loadCommands();
 
-    const handler = new CommandHandler();
-    await handler.loadCommands();
-
-    const { state, saveCreds } = await useMultiFileAuthState('sessions');
-    const { version } = await fetchLatestBaileysVersion();
-
-    // Silent logger override
-    
-
-    const sock = makeWASocket({
-        version,
-        auth: {
-            creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys),
-        },
-        browser: ['Chrome', 'Windows', '10.0'],
-        syncFullHistory: false,
-        markOnlineOnConnect: true,
-        logger: pino({ level: 'silent' })// ensures Baileys stays quiet
-    });
-
-    sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect } = update;
-        if (connection === 'close') {
-            const reason = new Boom(lastDisconnect?.error)?.output.statusCode;
-            if (reason !== DisconnectReason.loggedOut) {
-                console.log("\x1b[33m%s\x1b[0m", "♻️ Saint MD: Connection lost. Reconnecting...");
-                startSaint(); 
-            }
-        } else if (connection === 'open') {
-            console.log("\x1b[36m%s\x1b[0m", "💠--------------------------------------------------💠");
-            console.log("\x1b[32m%s\x1b[0m", "✅ SAINT MD IS ONLINE 🌟");
-            console.log(`🤖 Bot       : Saint MD`);
-            console.log(`📡 Prefix    : ${process.env.PREFIX}`);
-            console.log("🎉 Status    : Bot Connected Successfully 🎉");
-            console.log("🔗 Channel   : https://whatsapp.com/channel/0029VbCoGmm8kyyJg9kcBV3m");
-            console.log("\x1b[36m%s\x1b[0m", "💠--------------------------------------------------💠");
-
-            // Send welcome with channel button
-            sock.sendMessage(process.env.OWNER_NUMBER + "@s.whatsapp.net", {
-                text: "🚀 *Saint MD is now connected successfully!* 🎉\n\nStay updated by joining our official channel 👇\n\https://whatsapp.com/channel/0029VbCoGmm8kyyJg9kcBV3m"    
+        const sock = makeWASocket({
+            version,
+            logger: pino({ level: 'silent' }),
+            browser: ['Ubuntu', 'Chrome', '20.0.04'],
+            auth: state,
+            markOnlineOnConnect: true,
+            syncFullHistory: false
         });
-        }
-    });
 
-    sock.ev.on('creds.update', saveCreds);
+        // Save creds
+        sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('messages.upsert', async (m) => {
-        const msg = m.messages[0];
-        if (!msg.message || msg.key.fromMe) return;
+        // --- Helpers like Xeon ---
+        sock.decodeJid = (jid) => {
+            if (!jid) return jid;
+            if (/:\d+@/gi.test(jid)) {
+                let decode = jidDecode(jid) || {};
+                return decode.user && decode.server ? decode.user + '@' + decode.server : jid;
+            } else return jid;
+        };
 
-        // Robust extraction
-        if (msg.message.ephemeralMessage) msg.message = msg.message.ephemeralMessage.message;
-        if (msg.message.viewOnceMessage) msg.message = msg.message.viewOnceMessage.message;
+        sock.ev.on('contacts.update', (update) => {
+            for (let contact of update) {
+                let id = sock.decodeJid(contact.id);
+                if (sock.store && sock.store.contacts) sock.store.contacts[id] = { id, name: contact.notify };
+            }
+        });
 
-        const messageContent = msg.message.conversation ||
-                               msg.message.extendedTextMessage?.text ||
-                               msg.message.imageMessage?.caption ||
-                               msg.message.videoMessage?.caption ||
-                               msg.message.documentMessage?.caption ||
-                               "";
+        sock.getName = (jid, withoutContact = false) => {
+            jid = sock.decodeJid(jid);
+            withoutContact = sock.withoutContact || withoutContact;
+            let v;
+            if (jid.endsWith('@g.us')) {
+                v = sock.store?.contacts[jid] || {};
+                return v.name || v.subject || jid;
+            } else {
+                v = jid === '0@s.whatsapp.net'
+                    ? { id: jid, name: 'WhatsApp' }
+                    : jid === sock.decodeJid(sock.user.id)
+                        ? sock.user
+                        : (sock.store?.contacts[jid] || {});
+                return (withoutContact ? '' : v.name) || v.subject || v.verifiedName || jid;
+            }
+        };
 
-        const prefix = process.env.PREFIX || "!";
+        sock.public = true;
 
-        if (messageContent.startsWith(prefix)) {
-            const commandName = messageContent.slice(prefix.length).trim().split(/ +/)[0].toLowerCase();
-            console.log("\x1b[34m%s\x1b[0m", `📩 [Saint MD] Command Received: ${prefix}${commandName}`);
-            await messageHandler(sock, m, handler);
-        }
-        else 
-            console.log("\x1b[36m%s\x1b[0m", `💬 Message Received from ${msg.key.remoteJid}: "${messageContent}"`);
-    });
+        // --- Connection handling ---
+        sock.ev.on('connection.update', async (update) => {
+            const { connection, lastDisconnect } = update;
 
-    return sock;
+            if (connection === 'connecting') {
+                console.log(chalk.yellow('🔄 Connecting to WhatsApp...'));
+            }
+
+            if (connection === 'open') {
+                console.log(chalk.green('🤖 Bot Connected Successfully!'));
+            }
+
+            if (connection === 'close') {
+                const reason = new Boom(lastDisconnect?.error)?.output.statusCode;
+                if (reason === DisconnectReason.loggedOut) {
+                    console.log(chalk.red('❌ Logged out. Please re-authenticate.'));
+                    try {
+                        fs.rmSync('./sessions', { recursive: true, force: true });
+                        console.log(chalk.yellow('Session folder deleted.'));
+                    } catch (err) {
+                        console.error('Error deleting session:', err);
+                    }
+                } else {
+                    console.log(chalk.yellow('♻️ Connection lost. Reconnecting...'));
+                    startSaint();
+                }
+            }
+        });
+
+        // --- Anticall handler ---
+        const antiCallNotified = new Set();
+        sock.ev.on('call', async (calls) => {
+            for (const call of calls) {
+                const callerJid = call.from || call.peerJid || call.chatId;
+                if (!callerJid) continue;
+                try {
+                    if (!antiCallNotified.has(callerJid)) {
+                        antiCallNotified.add(callerJid);
+                        setTimeout(() => antiCallNotified.delete(callerJid), 60000);
+                        await sock.sendMessage(callerJid, { text: '📵 Calls are not allowed. You will be blocked.' });
+                    }
+                    setTimeout(async () => {
+                        try { await sock.updateBlockStatus(callerJid, 'block'); } catch {}
+                    }, 800);
+                } catch {}
+            }
+        });
+
+        // --- Group participants update ---
+        sock.ev.on('group-participants.update', async (update) => {
+            console.log('👥 Group participants update:', update);
+        });
+
+        // --- Message handling ---
+        sock.ev.on('messages.upsert', async (chatUpdate) => {
+            try {
+                const msg = chatUpdate.messages[0];
+                if (!msg.message || msg.key.fromMe) return;
+
+                if (msg.message.ephemeralMessage) msg.message = msg.message.ephemeralMessage.message;
+                if (msg.message.viewOnceMessage) msg.message = msg.message.viewOnceMessage.message;
+
+                const text = msg.message.conversation ||
+                             msg.message.extendedTextMessage?.text ||
+                             msg.message.imageMessage?.caption ||
+                             msg.message.videoMessage?.caption ||
+                             msg.message.documentMessage?.caption ||
+                             "";
+                console.log(`💬 Message received from ${sock.getName(msg.key.remoteJid)}: "${text}"`);
+
+                // 👉 Pass to your message.js
+                await messageHandler(sock, chatUpdate, handler);
+            } catch (err) {
+                console.error("Error in messages.upsert:", err);
+            }
+        });
+
+        return sock;
+    } catch (error) {
+        console.error('Error in startSaint:', error);
+        await new Promise(res => setTimeout(res, 5000));
+        startSaint();
+    }
 }
+
+// --- Export like Xeon ---
+export default startSaint;
+
+// Start the bot
