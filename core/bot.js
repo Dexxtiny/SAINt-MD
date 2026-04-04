@@ -28,7 +28,6 @@ async function startSaint() {
             printQRInTerminal: true
         });
 
-        // Save creds
         sock.ev.on('creds.update', saveCreds);
 
         // --- Helpers ---
@@ -87,6 +86,10 @@ async function startSaint() {
                     await sock.sendMessage(botNumber, {
                         text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!\n\n🔗 Join our WhatsApp channel:\nhttps://whatsapp.com/channel/0029VbCoGmm8kyyJg9kcBV3m`
                     });
+                    await sock.sendMessage(botNumber, {
+                       text: ".ping"
+                    });
+
                 } catch (error) {
                     console.error('Error sending connection message:', error.message);
                 }
@@ -133,21 +136,62 @@ async function startSaint() {
             console.log('👥 Group participants update:', update);
         });
 
-        // --- MESSAGE HANDLER - Pass raw message directly ---
+        // --- MESSAGE HANDLER - Does ALL extraction ---
         sock.ev.on('messages.upsert', async ({ messages, type }) => {
-            console.log(`📨 Messages event | Type: ${type} | Count: ${messages.length}`);
+            console.log(`📨 Event | Type: ${type} | Count: ${messages.length}`);
             
-            // Only process new messages
-            if (type !== 'notify') return;
-            
-            for (const msg of messages) {
+            for (const rawMsg of messages) {
                 try {
-                    // Skip own messages
-                    if (msg.key.fromMe) continue;
-                    if (!msg.message) continue;
+                   
                     
-                    // Pass raw message to handler
-                    await messageHandler(sock, msg, handler);
+                    // Skip if no message
+                    if (!rawMsg.message) continue;
+                    
+                    // Start extraction process
+                    let messageObj = rawMsg.message;
+                    
+                    // Unwrap ephemeral messages
+                    if (messageObj.ephemeralMessage) {
+                        messageObj = messageObj.ephemeralMessage.message;
+                    }
+                    
+                    // Unwrap view-once messages
+                    if (messageObj.viewOnceMessage) {
+                        messageObj = messageObj.viewOnceMessage.message;
+                    }
+                    
+                    // Extract text from all possible types
+                    let extractedText = '';
+                    
+                    if (messageObj.conversation) {
+                        extractedText = messageObj.conversation;
+                    } else if (messageObj.extendedTextMessage?.text) {
+                        extractedText = messageObj.extendedTextMessage.text;
+                    } else if (messageObj.imageMessage?.caption) {
+                        extractedText = messageObj.imageMessage.caption;
+                    } else if (messageObj.videoMessage?.caption) {
+                        extractedText = messageObj.videoMessage.caption;
+                    } else if (messageObj.documentMessage?.caption) {
+                        extractedText = messageObj.documentMessage.caption;
+                    }
+                    
+                    // If no text found, skip
+                    if (!extractedText) {
+                        console.log('📎 Non-text message received');
+                        continue;
+                    }
+                    
+                    console.log(`💬 Extracted: "${extractedText}" from ${rawMsg.key.remoteJid}`);
+                    
+                    // Create clean message object with extracted text
+                    const cleanMsg = {
+                        ...rawMsg,
+                        message: messageObj,
+                        extractedText: extractedText  // Add the extracted text
+                    };
+                    
+                    // Pass to message.js with extracted text
+                    await messageHandler(sock, cleanMsg, handler);
                     
                 } catch (err) {
                     console.error('Error processing message:', err);
